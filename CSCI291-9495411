@@ -1,0 +1,186 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Prices are declared for each product 
+float price_A = 2.00;
+float price_B = 1.50;
+float price_C = 1.00;
+float total_amount = 0.0;
+
+// Quantity of each product is declared 
+int quantity_A = 10;
+int quantity_B = 10;
+int quantity_C = 10;
+
+// Minimum value for quantity is set and also the password for the admin mode 
+#define min 2
+#define password 123
+
+int main() {    // Main infinity loop runs until the user exits 
+    int main_choice;
+
+    while (1) { //Main menu to select the options 
+        printf("VENDING MACHINE MAIN MENU\n");
+        printf("1. Purchase Product\n");
+        printf("2. Admin mode\n");
+        printf("3. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &main_choice);
+
+        // Customer mode main menu
+        if (main_choice == 1) {
+            int choice;
+            float price;
+            float inserted_amount;
+            float coin;
+
+            printf("1. Product A - %.2f AED\n", price_A);
+            printf("2. Product B - %.2f AED\n", price_B);
+            printf("3. Product C - %.2f AED\n", price_C);
+            printf("0. Cancel\n");
+            printf("Choose a product: ");
+            scanf("%d", &choice);
+
+            if (choice == 0) {
+                printf("The purchase is cancelled.\n");
+                continue;
+            }
+
+            if (choice == 1) price = price_A;
+            else if (choice == 2) price = price_B;
+            else if (choice == 3) price = price_C;
+            else {
+                printf("Invalid option!\n");
+                continue;
+            }
+
+            if ((choice == 1 && quantity_A <= 0) ||
+                (choice == 2 && quantity_B <= 0) ||
+                (choice == 3 && quantity_C <= 0)) {
+                printf("Sorry, this product is sold out \n");
+                continue;
+            }
+
+            printf("You selected Product %d - price %.2f AED\n", choice, price);
+            printf("Enter -1 to reselect or any number to continue: ");
+            int confirm;
+            scanf("%d", &confirm);
+            if (confirm == -1) continue;
+
+            inserted_amount = 0;
+            while (inserted_amount < price) {
+                printf("Insert coin 1 - 0.5 - 0.25 : ");
+                scanf("%f", &coin);
+
+                if (coin == 1 || coin == 0.5 || coin == 0.25) {
+                    inserted_amount += coin;
+                    printf("Paid : %.2f , Remaining: %.2f\n",
+                           inserted_amount, price - inserted_amount);
+                } else {
+                    int cancel;
+                    printf("Invalid coin ! \n Cancel purchase ? (1=Yes, 0=No): ");
+                    scanf("%d", &cancel);
+                    if (cancel == 1) {
+                        printf("Payment cancelled - Returning %.2f AED\n", inserted_amount);
+                        inserted_amount = 0;
+                        break;
+                    }
+                }
+            }
+
+            if (inserted_amount >= price && inserted_amount != 0) {
+                printf("Purchase successful ! Please collect your product.\n");
+                if (inserted_amount > price)
+                    printf("Change: %.2f AED\n", inserted_amount - price);
+
+                if (choice == 1) quantity_A--;
+                else if (choice == 2) quantity_B--;
+                else if (choice == 3) quantity_C--;
+
+                total_amount += price;
+
+                if ((choice == 1 && quantity_A <= min) ||
+                    (choice == 2 && quantity_B <= min) ||
+                    (choice == 3 && quantity_C <= min)) {
+                    printf("Stock for product %d is low.\n", choice);
+                }
+            }
+        }
+
+        // Admin mode -
+        else if (main_choice == 2) {
+            int pass;
+            printf("Enter admin password: ");
+            scanf("%d", &pass);
+
+            if (pass != password) {
+                printf("Incorrect password. Returning to main menu.\n");
+                continue;
+            }
+
+            int admin_choice;
+            while (1) {
+                printf(" ADMIN MENU \n");
+                printf("1. Replenish products\n");
+                printf("2. Change product prices\n");
+                printf("3. Display total sales\n");
+                printf("4. Display product quantities\n");
+                printf("0. Exit admin mode\n");
+                printf("Enter choice: ");
+                scanf("%d", &admin_choice);
+
+                if (admin_choice == 1) {
+                    quantity_A = (rand() % 20) + 1;
+                    quantity_B = (rand() % 20) + 1;
+                    quantity_C = (rand() % 20) + 1;
+                    printf("Products replenished successfully.\n");
+                } 
+                else if (admin_choice == 2) {
+                    printf("Enter new price for product A: ");
+                    scanf("%f", &price_A);
+                    printf("Enter new price for product B: ");
+                    scanf("%f", &price_B);
+                    printf("Enter new price for product C: ");
+                    scanf("%f", &price_C);
+                    printf("Prices updated.\n");
+                } 
+                else if (admin_choice == 3) {
+                    printf("Total sales: %.2f AED\n", total_amount);
+                    int reset;
+                    printf("Reset total? (1=Yes, 0=No): ");
+                    scanf("%d", &reset);
+                    if (reset == 1) {
+                        total_amount = 0;
+                        printf("Total amount reset. Please collect the cash.\n");
+                    }
+                } 
+                else if (admin_choice == 4) {
+                    printf("\n--- PRODUCT QUANTITIES ---\n");
+                    printf("Product A: %d\n", quantity_A);
+                    printf("Product B: %d\n", quantity_B);
+                    printf("Product C: %d\n", quantity_C);
+                } 
+                else if (admin_choice == 0) {
+                    printf("Exiting admin mode...\n");
+                    break;
+                } 
+                else {
+                    printf("Invalid option! Try again.\n");
+                }
+            }
+        }
+
+        // If the main choice is 3 - program exits 
+        else if (main_choice == 3) {
+            printf("Exit\n");
+            break;
+        }
+
+        // Invalid options are inputed 
+        else {
+            printf("Invalid option. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
