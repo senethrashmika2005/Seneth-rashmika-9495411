@@ -1,0 +1,205 @@
+#include <stdio.h>
+#include <string.h>
+#define numOfStudents 5
+#define numOfSubjects 3
+
+// Structure to store all the student details 
+struct student {
+    char firstName[20];   
+    char lastName[20];   
+    int studentID;       
+    float subjectMarks[numOfSubjects]; 
+    float average;        
+    char grade[10];       
+}; 
+
+// Function prototypes for all the tasks
+void enroll(struct student s[], int i);
+void searchUpdate(struct student s[]);
+void topStudent(struct student s[]);
+void findGrade(struct student *s);
+
+int main() {
+    struct student s[numOfStudents];  // Array of students
+    int choice, count = 0;
+
+    // Setting default values
+    for (int i = 0; i < numOfStudents; i++) {
+        s[i].studentID = -1; 
+        s[i].average = -1;
+        strcpy(s[i].grade, "N/A"); // not assigned yet
+    }
+
+    // Main loop of the program 
+    while (1) {
+        printf("\n----- STUDENT MENU -----\n");
+        printf("1. Enroll student\n");
+        printf("2. Search / update student\n");
+        printf("3. Top student\n");
+        printf("0. Exit\n");
+        printf("Please enter choice: ");
+        scanf("%d", &choice);
+
+        // Options for user
+        if (choice == 1) {
+            if (count < numOfStudents) {
+                enroll(s, count); 
+                count++;
+            } else {
+                printf("List is full!\n"); 
+            }
+        } 
+        else if (choice == 2) {
+            searchUpdate(s); 
+        } 
+        else if (choice == 3) {
+            topStudent(s); 
+        } 
+        else if (choice == 0) {
+            printf("Exiting program...\n");
+            break; 
+        } 
+        else {
+            printf("Invalid input, try again\n");
+        }
+    }
+
+    return 0;
+}
+
+// function to add a new student record
+void enroll(struct student s[], int i) {
+    printf("\n ENROLL STUDENT \n") ;
+    printf("Enter first name : ");
+    scanf("%s", s[i].firstName);
+    printf("Enter last name : ") ;
+    scanf("%s", s[i].lastName) ;
+    printf("Enter student ID : ") ;
+    scanf("%d", &s[i].studentID) ;
+
+    int missing = 0 ; // check if any subject is skippe
+
+    for (int j = 0; j < numOfSubjects; j++) {
+        int ans;
+        printf("Enter mark for subject %d? (1=Yes 0=No): ", j + 1);
+        scanf("%d", &ans);
+
+        if (ans == 1) {
+            printf("Enter mark: ");
+            scanf("%f", &s[i].subjectMarks[j]);
+
+            // validate the marks inputed 
+            if (s[i].subjectMarks[j] < 0 || s[i].subjectMarks[j] > 100) {
+                printf("Invalid mark input, set to -1\n");
+                s[i].subjectMarks[j] = -1;
+            }
+        } 
+        else {
+            s[i].subjectMarks[j] = -1;
+            missing = 1; // if it is not entered
+        }
+    }
+
+    // Only calculate avg if all marks are entered
+    if (missing == 0) {
+        findGrade(&s[i]);
+    } else {
+        s[i].average = -1;
+        strcpy(s[i].grade, "undefined");
+    }
+}
+
+// function to calculate the average and assign grades 
+void findGrade(struct student *s) {
+    float total = 0;
+    for (int i = 0; i < numOfSubjects; i++)
+        total += s->subjectMarks[i]; 
+
+    s->average = total / numOfSubjects;
+
+    // grade based on the average value
+    if (s->average >= 85) strcpy(s->grade, "HD");
+    else if (s->average >= 75) strcpy(s->grade, "D");
+    else if (s->average >= 65) strcpy(s->grade, "C");
+    else if (s->average >= 50) strcpy(s->grade, "P");
+    else strcpy(s->grade, "F");
+}
+
+// Search and update the details 
+void searchUpdate(struct student s[]) {
+    int option, found = -1;
+    printf("\nSearch by: 1-ID  2-Last Name : ");
+    scanf("%d", &option);
+
+    if (option == 1) {
+        int id;
+        printf("Enter ID :  ");
+        scanf("%d", &id);
+        for (int i = 0; i < numOfStudents; i++) {
+            // check for match either student name or ID
+            if (s[i].studentID == id && s[i].studentID != -1) {
+                found = i;
+                break;
+            }
+        }
+    } 
+    else if (option == 2) {
+        char lname[20];
+        printf("Enter last name : ");
+        scanf("%s", lname);
+        for (int i = 0; i < numOfStudents; i++) {
+            if (strcmp(s[i].lastName, lname) == 0) { 
+                found = i;
+                break;
+            }
+        }
+    }
+
+    if (found == -1) {
+        printf("Student not found \n");
+        return;
+    }
+
+    printf("\nStudent found : %s %s ID:%d \nAverage : %.2f Grade : %s\n",
+           s[found].firstName, s[found].lastName, s[found].studentID,
+           s[found].average, s[found].grade);
+
+    int up;
+    // Asks the user to edit the data
+    printf("Update first name? 1 = Yes 0 = No : ");
+    scanf("%d", &up);
+    if (up) scanf("%s", s[found].firstName);
+
+    printf("Update last name? 1 = Yes 0 = No : ");
+    scanf("%d", &up);
+    if (up) scanf("%s", s[found].lastName);
+
+    printf("Update marks ? 1 = Yes 0 = No: ");
+    scanf("%d", &up);
+    if (up) {
+        for (int j = 0; j < numOfSubjects; j++) {
+            printf("Enter new mark for subject %d: ", j + 1);
+            scanf("%f", &s[found].subjectMarks[j]);
+        }
+        findGrade(&s[found]); 
+    }
+}
+
+// function to display the top student details 
+void topStudent(struct student s[]) {
+    float max = -1;
+    // find highest average
+    for (int i = 0; i < numOfStudents; i++) {
+        if (s[i].average > max)
+            max = s[i].average;
+    }
+
+    printf("\n TOP STUDENT \n");
+    for (int i = 0; i < numOfStudents; i++) {
+        if (s[i].average == max && max != -1) {
+            printf("%s %s (ID:%d) Avg:%.2f Grade:%s\n",
+                   s[i].firstName, s[i].lastName, s[i].studentID,
+                   s[i].average, s[i].grade);
+        }
+    }
+}
