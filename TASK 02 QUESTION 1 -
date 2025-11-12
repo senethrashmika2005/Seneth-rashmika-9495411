@@ -1,0 +1,136 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+// The length of the 1D array is set 
+#define SIZE 24
+// The number of rows in 2D matrix is set
+#define nRows 8
+// The numer of columns in 2D matrix is set
+#define nCols 3
+
+// Prototypes of functions used /
+void set_array(int a[], int n);
+void print_array(int a[], int n);
+void print_matrix(int m[][nCols], int r);
+void rem_align(int a[], int n, int p);
+void insert_align(int a[], int n, int p, int v);
+void reshape(int a[], int n, int m[][nCols], int r);
+void print_trans_matrix(int m[][nCols], int r);
+bool found_duplicate(int a[], int n);
+void flip_array(int a[], int n, int r[]);
+
+int main() {
+    
+    int arr[SIZE], mat[nRows][nCols], rev[SIZE];
+
+// fills the araay with index values  
+    set_array(arr, SIZE);
+    printf("Initial array : \n");
+    print_array(arr, 10);
+
+//Remove element at index 2 and shift all the values left
+    rem_align(arr, SIZE, 2);
+    printf("\nAfter removing the element at index 2 :\n");
+    print_array(arr, 10);
+
+// Insert 80 at index 2 and push all values to the right
+    insert_align(arr, SIZE, 2, 80);
+    printf("\nAfter inserting 80 at index 2 :\n");
+    print_array(arr, 10);
+
+//Reshape 1D array into 2D matrix 
+    reshape(arr, nRows * nCols, mat, nRows);
+    printf("\nMatrix ( row by row ) :\n");
+    print_matrix(mat, nRows);
+
+// Prints the matrix column wise 
+    printf("\nMatrix ( column by column ) :\n");
+    print_trans_matrix(mat, nRows);
+
+//Checks for any duplicate numbers in the array
+    if (found_duplicate(arr, SIZE)) {
+        printf("\nDuplicate found - True \n");
+    } 
+    else {
+        printf("\nNo duplicates found - False \n");
+    }
+
+//Reverses the array  
+    flip_array(arr, SIZE, rev);
+    printf("\nReversed array :\n");
+    print_array(rev, SIZE);
+
+    return 0;
+}
+
+void set_array(int a[], int n) {
+    for (int i = 0; i < n; i++) a[i] = i;
+}
+
+void print_array(int a[], int n) {
+    for (int i = 0; i < n; i++) 
+        printf("%d ", a[i]);
+    printf("\n");
+}
+
+void print_matrix(int m[][nCols], int r) {
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < nCols; j++) 
+            printf("%4d", m[i][j]);
+        printf("\n");
+    }
+}
+
+void rem_align(int a[], int n, int p) {
+    if (p < 0 || p >= n) { 
+        printf("Invalid position\n"); 
+        return;
+    }
+    for (int i = p; i < n - 1; i++) 
+        a[i] = a[i + 1];
+}
+
+void insert_align(int a[], int n, int p, int v) {
+    if (p < 0 || p >= n) {
+        printf("Invalid position\n");
+        return;
+    }
+    for (int i = n - 1; i > p; i--)
+        a[i] = a[i - 1];
+    a[p] = v;
+}
+
+void reshape(int a[], int n, int m[][nCols], int r) {
+    if (n != r * nCols) {
+        printf("Error: size mismatch\n");
+        return;
+    }
+    for (int k = 0, i = 0; i < r; i++)
+        for (int j = 0; j < nCols; j++)
+            m[i][j] = a[k++];
+}
+
+
+void print_trans_matrix(int m[][nCols], int r) {
+    for (int j = 0; j < nCols; j++) {
+        for (int i = 0; i < r; i++) 
+            printf("%4d", m[i][j]);
+        printf("\n");
+    }
+}
+
+
+bool found_duplicate(int a[], int n) {
+    for (int i = 0; i < n - 1; i++)
+        for (int j = i + 1; j < n; j++)
+            if (a[i] == a[j])
+                return true;
+    return false;
+}
+
+
+void flip_array(int a[], int n, int r[]) {
+    for (int i = 0; i < n; i++)
+        r[i] = a[n - 1 - i];
+}
