@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main()
+{
+    FILE *fp;
+    char name[50] ; 
+    char line[100] ;
+    int mark ;
+    int validCount = 0 ;
+    int invalidCount = 0  ;
+    int totalMarks = 0 ;
+
+    // open the file
+    fp = fopen("students.txt", "r");
+
+    // check if file exists
+    if(fp == NULL)
+    {
+        printf("Error : File not found.\n");
+        return 0;
+    }
+
+    printf("Valid records:\n");
+
+    // read file line by line
+    while(fgets(line, sizeof(line), fp) != NULL)
+    {
+        // To read name and mark
+        if(sscanf(line, "%s %d", name, &mark) == 2)
+        {
+            int validName = 1;
+            int i;
+
+            // check if name has printable non-digit characters
+            for(i = 0; i < strlen(name); i++)
+            {
+                if(!isprint(name[i]) || isdigit(name[i]))
+                {
+                    validName = 0;
+                    break;
+                }
+            }
+
+            // if name is valid
+            if(validName)
+            {
+                printf("%s %d\n", name, mark);
+                validCount++;
+                totalMarks += mark;
+            }
+            
+            else
+            {
+                invalidCount++;
+            }
+        }
+        
+        else
+        {
+            // record missing fields or corrupted
+            invalidCount++;
+        }
+    }
+
+    //output
+    printf("\nTotal valid records: %d\n", validCount);
+    printf("Total corrupted records: %d\n", invalidCount);
+
+    if(validCount > 0)
+        printf("Average mark: %.2f\n", (float) totalMarks / validCount);
+    else
+        printf("Average mark: N/A\n");
+
+    fclose(fp);
+    return 0;
+}
