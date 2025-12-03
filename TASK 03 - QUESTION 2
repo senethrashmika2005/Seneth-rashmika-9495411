@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CUR 4
+
+// Function for currency exchange
+void curr_change(float amCur1, float amMax, float excRate, float *amCur2, float *leftOver)
+{
+    float amountToExchange;
+
+    // Check max exchange amount
+    if(amCur1 > amMax) {
+        amountToExchange = amMax;
+        *leftOver = amCur1 - amMax;
+    }
+    else {
+        *leftOver = 0;
+        amountToExchange = amCur1;
+    }
+
+    // Calculate converted amount
+    *amCur2 = amountToExchange * excRate;
+}
+
+// Main program
+int main()
+{
+    char currencies[MAX_CUR][10] = {"MYR" , "USD" , "EUR" , "JPY"}; 
+    // index 0 = local currency (MYR)
+
+    /* Exchange rates:
+       From MYR → foreign (sell)
+       From foreign → MYR (buy)
+    */
+
+    float sellRate[MAX_CUR] = {0 , 0.22 , 0.20 , 32.0};   // MYR → foreign
+    float buyRate[MAX_CUR]  = {0 , 4.50 , 4.80 , 0.030}; // foreign → MYR
+
+    float amount, converted, leftover;
+    char from[10], to[10];
+    int fromIndex = -1, toIndex = -1;
+    int i;
+
+    printf("Available currencies:\n");
+    for(i = 0; i < MAX_CUR; i++)
+        printf("- %s\n", currencies[i]);
+
+    printf("\nEnter amount: ");
+    scanf("%f", &amount);
+
+    printf("Enter currency you have: ");
+    scanf("%s", from);
+
+    printf("Enter currency you want: ");
+    scanf("%s", to);
+
+    // Validate currency input
+    for(i = 0; i < MAX_CUR; i++) {
+        if(strcmp(from, currencies[i]) == 0)
+            fromIndex = i;
+
+        if(strcmp(to, currencies[i]) == 0)
+            toIndex = i;
+    }
+
+    if(fromIndex == -1 || toIndex == -1) {
+        printf("\nError: Invalid currency entered\n");
+        return 0;
+    }
+
+    /* Rule:
+       Exchange only allowed between MYR and another currency.
+       Not international → international
+    */
+
+    if(fromIndex != 0 && toIndex != 0) {
+        printf("\nError: Exchange only allowed between MYR and another currency.\n");
+        return 0;
+    }
+
+    // Determine the correct exchange rate
+    float rate;
+
+    // MYR → foreign currency
+    if(fromIndex == 0 && toIndex != 0) {
+        rate = sellRate[toIndex];
+    }
+    // Foreign → MYR
+    else if(fromIndex != 0 && toIndex == 0) {
+        rate = buyRate[fromIndex];
+    }
+    else {
+        printf("\nError: Cannot convert same currency.\n");
+        return 0;
+    }
+
+    // Process conversion
+    curr_change(amount, 10000, rate, &converted, &leftover);
+
+    // Display results
+    printf("\nExchange rate: %.2f\n", rate);
+    printf("Converted amount: %.2f %s\n", converted, to);
+    printf("Leftover amount: %.2f %s\n", leftover, from);
+
+    return 0;
+}
