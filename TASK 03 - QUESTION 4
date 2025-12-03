@@ -1,0 +1,73 @@
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+
+// Template Function: S calibrateValue
+template <typename S>
+S calibrateValue(const S &x, char factor) {
+    return x * factor;  // Returns the product of x and factor
+}
+
+// Function: void adjustReading
+void adjustReading(double *value, double offset = 1.25) {
+    *value += offset;  // Adjusts the sensor reading by the given offset
+}
+
+// Function: void clampReading
+void clampReading(double &r) {
+    if (r < 0) r = 0;
+    if (r > 100) r = 100;  // Ensures that the reading stays within 0 to 100
+}
+
+// Function: double computeDifference
+double computeDifference(int a, double b) {
+    return a - b;  // Computes the difference between an integer and a double
+}
+
+int main() {
+    // Declare variables for sensor readings
+    int intSensor;
+    double doubleSensor;
+
+    // Get user inputs for the sensor readings
+    cout << "Enter the integer sensor reading: ";
+    cin >> intSensor;
+
+    cout << "Enter the double sensor reading: ";
+    cin >> doubleSensor;
+
+    // Calibrate sensor readings
+    int intCalibrated = calibrateValue(intSensor, 2);
+    double doubleCalibrated = calibrateValue(doubleSensor, 2);
+
+    cout << "Calibrated integer sensor reading: " << intCalibrated << endl;
+    cout << "Calibrated double sensor reading: " << fixed << setprecision(4) << doubleCalibrated << endl;
+
+    // Convert integer reading to double
+    double intToDouble = static_cast<double>(intCalibrated);
+
+    // Adjust the readings
+    adjustReading(&intToDouble);  // Adjust the integer (now in double) without offset
+    adjustReading(&doubleSensor, 3.4);  // Adjust the double sensor with offset of 3.4
+
+    cout << "Adjusted integer sensor reading (converted to double): " << fixed << setprecision(4) << intToDouble << endl;
+    cout << "Adjusted double sensor reading: " << fixed << setprecision(4) << doubleSensor << endl;
+
+    // Clamp the readings to ensure they stay within valid range
+    clampReading(intToDouble);
+    clampReading(doubleSensor);
+
+    cout << "Clamped integer sensor reading: " << fixed << setprecision(4) << intToDouble << endl;
+    cout << "Clamped double sensor reading: " << fixed << setprecision(4) << doubleSensor << endl;
+
+    // Convert the integer sensor back from double
+    int finalIntSensor = static_cast<int>(intToDouble);
+
+    // Compute the difference between the clamped readings
+    double difference = computeDifference(finalIntSensor, doubleSensor);
+
+    cout << "Difference between clamped integer and double sensor readings: " << fixed << setprecision(4) << difference << endl;
+
+    return 0;
+}
