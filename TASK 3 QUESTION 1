@@ -1,0 +1,79 @@
+#include <stdio.h>
+
+void separateIterative(int arr[], int n, int out[]) {
+    int index = 0;
+
+    // 1st pass – odds
+    for (int i = 0; i < n; i++) {
+        if (arr[i] % 2 != 0) {
+            out[index] = arr[i];
+            index++;
+        }
+    }
+
+    // 2nd pass – evens
+    for (int i = 0; i < n; i++) {
+        if (arr[i] % 2 == 0) {
+            out[index] = arr[i];
+            index++;
+        }
+    }
+}
+
+// Recursive helper for odds
+void recOdds(int arr[], int n, int i, int out[], int *index) {
+    if (i == n) return;
+
+    if (arr[i] % 2 != 0) {
+        out[*index] = arr[i];
+        (*index)++;
+    }
+    recOdds(arr, n, i + 1, out, index);
+}
+
+// Recursive helper for evens
+void recEvens(int arr[], int n, int i, int out[], int *index) {
+    if (i == n) return;
+
+    if (arr[i] % 2 == 0) {
+        out[*index] = arr[i];
+        (*index)++;
+    }
+    recEvens(arr, n, i + 1, out, index);
+}
+
+void separateRecursive(int arr[], int n, int out[]) {
+    int index = 0;
+    recOdds(arr, n, 0, out, &index);
+    recEvens(arr, n, 0, out, &index);
+}
+
+int main() {
+    int n, i;
+    int arr[100];
+    int outIter[100];
+    int outRec[100];
+
+    printf("Enter the array size: ");
+    scanf("%d", &n);
+
+    printf("Enter the integers:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    // Iterative
+    separateIterative(arr, n, outIter);
+    printf("Iterative result (odd first, even after):\n");
+    for (i = 0; i < n; i++)
+        printf("%d ", outIter[i]);
+    printf("\n");
+
+    // Recursive
+    separateRecursive(arr, n, outRec);
+    printf("Recursive result (odd first, even after):\n");
+    for (i = 0; i < n; i++)
+        printf("%d ", outRec[i]);
+    printf("\n");
+
+    return 0;
+}
